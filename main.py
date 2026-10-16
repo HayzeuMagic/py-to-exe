@@ -1,6 +1,7 @@
 """PyForge entry point."""
 from __future__ import annotations
 
+import multiprocessing
 import sys
 import traceback
 
@@ -22,4 +23,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # Required when frozen with PyInstaller on Windows: without this, a
+    # library using multiprocessing could re-launch this entire script
+    # (and therefore the whole GUI) in each worker process.
+    multiprocessing.freeze_support()
     sys.exit(main())

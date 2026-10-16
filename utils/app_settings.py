@@ -12,7 +12,7 @@ logger = get_logger("app_settings")
 
 @dataclass
 class AppSettings:
-    appearance: str = "dark"  # "dark" or "light"
+    appearance: str = "light"  # "light" or "dark"
     default_output_dir: str = ""
     default_output_mode: str = "one_file"  # "one_file" | "one_folder"
     default_console_mode: str = "console"  # "console" | "windowed"

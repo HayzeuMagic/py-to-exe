@@ -51,7 +51,7 @@ class ConfirmDialog(ctk.CTkToplevel):
         ctk.CTkButton(
             button_row, text=confirm_text,
             fg_color=theme.ERROR if danger else theme.ACCENT,
-            hover_color="#D85D63" if danger else theme.ACCENT_HOVER,
+            hover_color="#B91C1C" if danger else theme.ACCENT_HOVER,
             text_color=theme.WHITE if danger else theme.TEXT_ON_ACCENT,
             command=self._confirm,
         ).pack(side="right")

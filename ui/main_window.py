@@ -17,7 +17,7 @@ from core.build_report import BuildHistoryStore
 from core.compatibility_analyzer import CompatibilityAnalyzer
 from core.dependency_analyzer import DependencyAnalyzer
 from core.entry_point_detector import EntryPointDetector
-from core.environment_manager import EnvironmentManager
+from core.environment_manager import EnvironmentError_, EnvironmentManager
 from core.project_scanner import ProjectScanner
 from models.analysis_result import CompatibilityAnalysis, DependencyAnalysis
 from models.build_result import BuildConfig, BuildStatus, ConsoleMode, OutputMode
@@ -112,8 +112,9 @@ class MainWindow(ctk.CTk):
         view.grid_columnconfigure(0, weight=1, uniform="col")
         view.grid_columnconfigure(1, weight=1, uniform="col")
         view.grid_rowconfigure(0, weight=0)
-        view.grid_rowconfigure(1, weight=1)
+        view.grid_rowconfigure(1, weight=0)
         view.grid_rowconfigure(2, weight=1)
+        view.grid_rowconfigure(3, weight=1)
         self._views["Builder"] = view
 
         self.env_banner = ctk.CTkLabel(
@@ -122,30 +123,31 @@ class MainWindow(ctk.CTk):
         self.env_banner.grid(row=0, column=0, columnspan=2, sticky="ew", padx=theme.SPACING_LG, pady=(theme.SPACING_LG, 0))
 
         pad = theme.SPACING_MD
+
+        # Full-width toolbar: six buttons need more room than a half-width
+        # column can give them without clipping/overflowing into the panel
+        # next to it, so this spans the whole window instead of sharing a
+        # column with Build Configuration.
+        self._build_controls_row(view)
+
         self.project_panel = ProjectPanel(
             view, on_browse=self._browse_project, on_rescan=self._rescan_project, on_clear=self._clear_project
         )
-        self.project_panel.grid(row=1, column=0, sticky="nsew", padx=(theme.SPACING_LG, pad), pady=pad)
+        self.project_panel.grid(row=2, column=0, sticky="nsew", padx=(theme.SPACING_LG, pad), pady=pad)
 
         self.analysis_panel = AnalysisPanel(view)
-        self.analysis_panel.grid(row=1, column=1, sticky="nsew", padx=(pad, theme.SPACING_LG), pady=pad)
+        self.analysis_panel.grid(row=2, column=1, sticky="nsew", padx=(pad, theme.SPACING_LG), pady=pad)
         self.analysis_panel.show_empty()
 
-        left_bottom = ctk.CTkFrame(view, fg_color="transparent")
-        left_bottom.grid(row=2, column=0, sticky="nsew", padx=(theme.SPACING_LG, pad), pady=(0, theme.SPACING_LG))
-        left_bottom.grid_rowconfigure(1, weight=1)
-        left_bottom.grid_columnconfigure(0, weight=1)
-
-        self._build_controls_row(left_bottom)
-        self.build_settings = BuildSettingsPanel(left_bottom)
-        self.build_settings.grid(row=1, column=0, sticky="nsew", pady=(theme.SPACING_SM, 0))
+        self.build_settings = BuildSettingsPanel(view)
+        self.build_settings.grid(row=3, column=0, sticky="nsew", padx=(theme.SPACING_LG, pad), pady=(0, theme.SPACING_LG))
 
         self.log_panel = LogPanel(view)
-        self.log_panel.grid(row=2, column=1, sticky="nsew", padx=(pad, theme.SPACING_LG), pady=(0, theme.SPACING_LG))
+        self.log_panel.grid(row=3, column=1, sticky="nsew", padx=(pad, theme.SPACING_LG), pady=(0, theme.SPACING_LG))
 
     def _build_controls_row(self, parent) -> None:
         row = ctk.CTkFrame(parent, fg_color=theme.BG_PANEL, corner_radius=theme.RADIUS)
-        row.grid(row=0, column=0, sticky="ew")
+        row.grid(row=1, column=0, columnspan=2, sticky="ew", padx=theme.SPACING_LG, pady=(theme.SPACING_SM, 0))
 
         self.analyze_btn = ctk.CTkButton(
             row, text="Analyze Project", font=theme.font(12, "bold"), fg_color=theme.ACCENT,
@@ -155,7 +157,7 @@ class MainWindow(ctk.CTk):
 
         self.build_btn = ctk.CTkButton(
             row, text="Build Executable", font=theme.font(12, "bold"), fg_color=theme.SUCCESS,
-            hover_color="#3BBF6C", text_color=theme.NAVY_DEEP, command=self._start_build,
+            hover_color="#128038", text_color=theme.WHITE, command=self._start_build,
         )
         self.build_btn.pack(side="left", padx=(0, theme.SPACING_SM), pady=theme.SPACING_SM)
 
@@ -191,10 +193,15 @@ class MainWindow(ctk.CTk):
 
     def _check_environment(self) -> None:
         def work():
-            interpreter = self.env_manager.default_interpreter()
-            if self.settings.custom_interpreter:
-                interpreter = Path(self.settings.custom_interpreter)
-            info = self.env_manager.inspect(interpreter)
+            try:
+                if self.settings.custom_interpreter:
+                    interpreter = Path(self.settings.custom_interpreter)
+                else:
+                    interpreter = self.env_manager.default_interpreter()
+                info = self.env_manager.inspect(interpreter)
+            except EnvironmentError_ as exc:
+                self.after(0, lambda: self._show_environment_error(str(exc)))
+                return
             self.after(0, lambda: self._show_environment_info(info))
 
         threading.Thread(target=work, daemon=True).start()
@@ -211,6 +218,9 @@ class MainWindow(ctk.CTk):
                      "Go to Settings to install it before building.",
                 text_color=theme.WARNING,
             )
+
+    def _show_environment_error(self, message: str) -> None:
+        self.env_banner.configure(text=f"Build environment unavailable: {message}", text_color=theme.ERROR)
 
     # -- project scanning ------------------------------------------------------
 
@@ -576,7 +586,7 @@ class MainWindow(ctk.CTk):
         section("Appearance")
         self.appearance_var = ctk.StringVar(value=self.settings.appearance)
         ctk.CTkOptionMenu(
-            scroll, variable=self.appearance_var, values=["dark", "light"],
+            scroll, variable=self.appearance_var, values=["light", "dark"],
             command=self._on_appearance_change, fg_color=theme.BG_INPUT, button_color=theme.ACCENT_MUTED,
             button_hover_color=theme.ACCENT, text_color=theme.TEXT_PRIMARY,
         ).pack(anchor="w")

@@ -15,7 +15,7 @@ PyForge does not claim every Python project can be converted. Some projects use 
 - **Build validation** — confirms the expected executable/output folder actually exists and is non-empty before reporting success. This verifies the build produced artifacts — it does not verify runtime correctness.
 - **Build history & reports** — every build's metadata is stored in a local SQLite database (`%LOCALAPPDATA%\PyForge\history.db`), with a JSON report per build and a link to the full log.
 - **Settings** — appearance, default build options, scanner exclusions, log verbosity, and build-environment (interpreter) configuration, persisted locally.
-- **Rivan Security color scheme** — dark navy / sky-blue theme matching the Rivan Security Inc Academy brand.
+- **Rivan Security color scheme** — a white, light-UI theme with sky-blue/navy accents matching the Rivan Security Inc Academy brand.
 
 ## Supported build modes
 

@@ -1,46 +1,50 @@
 """PyForge design system — colors, spacing, and typography.
 
-Palette is derived from the Rivan Security Inc Academy logo: deep navy,
-sky blue accent, and white/near-white text.
+A light, white-dominant palette with blue accents (sampled from the Rivan
+Security Inc Academy logo's sky-blue ring and navy mark).
 """
 from __future__ import annotations
 
 import customtkinter as ctk
 
-# -- Core palette (sampled from rivan_logo.png) -----------------------------
+# -- Core palette (derived from rivan_logo.png) ------------------------------
 NAVY = "#0D2152"
-NAVY_DEEP = "#081630"
 SKY_BLUE = "#60D9FE"
-SKY_BLUE_HOVER = "#3EC6F0"
 WHITE = "#FFFFFF"
 
 # -- Semantic tokens ---------------------------------------------------------
-BG_APP = "#0A1830"
-BG_SIDEBAR = NAVY_DEEP
-BG_PANEL = "#0F2242"
-BG_PANEL_RAISED = "#132A52"
-BG_INPUT = "#0C1E3E"
+# App canvas: a very light cool-gray-white so white cards still read as
+# distinct surfaces, without ever looking "dark."
+BG_APP = "#F3F6FB"
+BG_SIDEBAR = "#FFFFFF"
+BG_PANEL = "#FFFFFF"
+BG_PANEL_RAISED = "#F2F6FC"
+BG_INPUT = "#F7F9FC"
 
-BORDER = "#1E3A66"
-BORDER_SUBTLE = "#162B50"
+BORDER = "#D9E2EF"
+BORDER_SUBTLE = "#E9EFF7"
 
-TEXT_PRIMARY = "#F2F6FC"
-TEXT_SECONDARY = "#9FB3D1"
-TEXT_MUTED = "#6B7FA3"
-TEXT_ON_ACCENT = NAVY_DEEP
+TEXT_PRIMARY = NAVY
+TEXT_SECONDARY = "#4C5E7A"
+TEXT_MUTED = "#8B9AB5"
+TEXT_ON_ACCENT = WHITE
 
-ACCENT = SKY_BLUE
-ACCENT_HOVER = SKY_BLUE_HOVER
-ACCENT_MUTED = "#1F4A6B"
+# A more saturated blue than the pale logo ring, so it has enough contrast
+# to carry white button text — the logo's sky blue is used for lighter
+# highlights/washes instead.
+ACCENT = "#0EA5E9"
+ACCENT_HOVER = "#0B86BD"
+ACCENT_MUTED = "#E3F3FC"
+ACCENT_WASH = SKY_BLUE
 
-SUCCESS = "#4ADE80"
-SUCCESS_BG = "#123524"
-WARNING = "#FBBF24"
-WARNING_BG = "#3A2F10"
-ERROR = "#F87171"
-ERROR_BG = "#3A1518"
-INFO = SKY_BLUE
-INFO_BG = "#102B3E"
+SUCCESS = "#16A34A"
+SUCCESS_BG = "#E7F8EE"
+WARNING = "#B45309"
+WARNING_BG = "#FFF6E3"
+ERROR = "#DC2626"
+ERROR_BG = "#FDEAEA"
+INFO = ACCENT
+INFO_BG = "#E7F6FD"
 
 FONT_FAMILY = "Segoe UI"
 FONT_FAMILY_MONO = "Consolas"
@@ -61,7 +65,7 @@ def font(size: int = 13, weight: str = "normal", mono: bool = False) -> ctk.CTkF
 
 
 def apply_appearance() -> None:
-    ctk.set_appearance_mode("dark")
+    ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("blue")
 
 
