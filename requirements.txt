@@ -1,0 +1,10 @@
+customtkinter>=5.2.2
+pyinstaller>=6.10.0
+Pillow>=10.4.0
+packaging>=24.0
+
+# Only needed on Python < 3.11 (pyproject.toml parsing uses stdlib tomllib on 3.11+)
+tomli>=2.0.1; python_version < "3.11"
+
+pytest>=8.0.0
+pytest-mock>=3.14.0

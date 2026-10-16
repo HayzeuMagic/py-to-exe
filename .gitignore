@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+env/
+build/
+dist/
+*.spec
+.pytest_cache/
+.mypy_cache/
+.tox/
+
+# PyForge runtime data (projects build into this layout during dev testing)
+pyforge_builds/
+*.log
+
+# App data written at runtime when run from source (normally lives in %LOCALAPPDATA%)
+.pyforge_data/
